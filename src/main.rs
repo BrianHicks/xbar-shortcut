@@ -14,7 +14,7 @@ impl Cli {
     async fn run(&self) -> Result<()> {
         let client = shortcut::Client::new(&self.shortcut_api_token);
 
-        let stories = client.stories().await?;
+        let stories = client.stories("owner:brnhx state:Ready").await?;
         println!("{stories:#?}");
 
         Ok(())

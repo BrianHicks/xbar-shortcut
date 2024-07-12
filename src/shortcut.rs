@@ -4,7 +4,6 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct SearchResponse<T> {
     pub next: Option<String>,
-    pub total: usize,
     pub data: Vec<T>,
 }
 
@@ -13,7 +12,7 @@ pub struct Story {
     pub name: String,
     pub app_url: String,
     pub story_type: String,
-    pub deadline: Option<String>,
+    pub deadline: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -35,22 +34,38 @@ impl Client {
         }
     }
 
-    pub async fn stories(&self) -> Result<Vec<Story>> {
+    pub async fn stories(&self, query: &str) -> Result<Vec<Story>> {
         let client = reqwest::Client::new();
 
-        let resp = client.get(
-            "https://api.app.shortcut.com/api/v3/search/stories?query=owner:brnhx%20state:Ready",
-        )
-        .header("Content-Type", "application/json")
-        .header("Shortcut-Token", &self.token)
-        .send().await
-        .wrap_err("could not make request to Shortcut's API")?;
+        let mut out = Vec::with_capacity(16);
+        let mut next = Some(String::new());
 
-        let search: SearchResponse<Story> = resp
-            .json()
-            .await
-            .wrap_err("could not read a search response from payload")?;
+        while let Some(next_url) = next {
+            let req = if next_url.is_empty() {
+                client
+                    .get("https://api.app.shortcut.com/api/v3/search/stories")
+                    .query(&[("query", query)])
+            } else {
+                client.get(format!("https://api.app.shortcut.com{next_url}"))
+            };
 
-        return Ok(search.data);
+            let resp = req
+                .header("Content-Type", "application/json")
+                .header("Shortcut-Token", &self.token)
+                .send()
+                .await
+                .wrap_err("could not make request to Shortcut's API")?;
+
+            let mut search: SearchResponse<Story> = resp
+                .json()
+                .await
+                .wrap_err("could not read a search response from payload")?;
+
+            next = search.next;
+
+            out.append(&mut search.data)
+        }
+
+        return Ok(out);
     }
 }
