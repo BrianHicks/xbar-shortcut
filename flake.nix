@@ -16,6 +16,7 @@
             pkgs.cargo
             pkgs.clippy
             pkgs.rustfmt
+            pkgs.rust-analyzer
 
             # macOS needs this for whatever reason
             pkgs.libiconv
