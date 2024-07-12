@@ -26,8 +26,6 @@ impl Cli {
     async fn run(&self) -> Result<()> {
         let client = shortcut::Client::new(&self.shortcut_api_token);
 
-        let now = chrono::Utc::now();
-
         let mut headline = String::with_capacity(16);
         let mut lines = Vec::with_capacity(32);
 
@@ -43,14 +41,14 @@ impl Cli {
                 line.push_str(&story.name);
                 line.push_str(" (");
                 line.push_str(&story.story_type);
-                line.push_str(")");
+                line.push(')');
 
                 if let Some(days) = days_remaining(story.planned_start_date, story.deadline) {
                     if days <= 1 {
                         headline.push_str("⚠️");
                         line.push_str(" ⚠️");
                     } else if days <= 7 {
-                        headline.push_str("🔜");
+                        headline.push('🔜');
                         line.push_str(" 🔜");
                     }
                 }
@@ -82,7 +80,7 @@ impl Cli {
                         headline.push_str("⚠️");
                         line.push_str(" ⚠️");
                     } else if days <= 7 {
-                        headline.push_str("🔜");
+                        headline.push('🔜');
                         line.push_str(" 🔜");
                     }
                 }
