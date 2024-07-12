@@ -16,9 +16,9 @@ impl Cli {
 fn main() {
     color_eyre::install().expect("color_eyre to install handlers");
 
-    let opts = Cli::parse();
+    let cli = Cli::parse();
 
-    if let Err(err) = opts.run() {
+    if let Err(err) = cli.run() {
         println!("{err:?}");
         std::process::exit(1)
     }
