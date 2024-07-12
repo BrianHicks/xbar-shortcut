@@ -36,11 +36,11 @@ impl Client {
     }
 
     pub async fn stories(&self, query: &str) -> Result<Vec<Story>> {
-        return self.search("stories", query).await;
+        self.search("stories", query).await
     }
 
     pub async fn epics(&self, query: &str) -> Result<Vec<Epic>> {
-        return self.search("epics", query).await;
+        self.search("epics", query).await
     }
 
     pub async fn search<T: serde::de::DeserializeOwned>(
@@ -79,6 +79,6 @@ impl Client {
             out.append(&mut search.data)
         }
 
-        return Ok(out);
+        Ok(out)
     }
 }
