@@ -1,4 +1,5 @@
 use clap::Parser;
+use color_eyre::Result;
 
 #[derive(Debug, Parser)]
 struct Cli {
@@ -6,8 +7,19 @@ struct Cli {
     shortcut_token: String,
 }
 
+impl Cli {
+    fn run(&self) -> Result<()> {
+        color_eyre::eyre::bail!("TODO")
+    }
+}
+
 fn main() {
+    color_eyre::install().expect("color_eyre to install handlers");
+
     let opts = Cli::parse();
 
-    println!("{opts:#?}")
+    if let Err(err) = opts.run() {
+        println!("{err:?}");
+        std::process::exit(1)
+    }
 }
