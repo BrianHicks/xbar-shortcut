@@ -4,7 +4,7 @@ use color_eyre::Result;
 #[derive(Debug, Parser)]
 struct Cli {
     /// The token to use to request information from Shortcut's REST API
-    shortcut_token: String,
+    shortcut_api_token: String,
 }
 
 impl Cli {
