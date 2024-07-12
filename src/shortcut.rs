@@ -35,6 +35,10 @@ impl Client {
     }
 
     pub async fn stories(&self, query: &str) -> Result<Vec<Story>> {
+        return self.search(query).await;
+    }
+
+    pub async fn search<T: serde::de::DeserializeOwned>(&self, query: &str) -> Result<Vec<T>> {
         let client = reqwest::Client::new();
 
         let mut out = Vec::with_capacity(16);
@@ -56,7 +60,7 @@ impl Client {
                 .await
                 .wrap_err("could not make request to Shortcut's API")?;
 
-            let mut search: SearchResponse<Story> = resp
+            let mut search: SearchResponse<T> = resp
                 .json()
                 .await
                 .wrap_err("could not read a search response from payload")?;
