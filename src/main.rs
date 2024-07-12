@@ -1,24 +1,33 @@
+mod shortcut;
+
 use clap::Parser;
 use color_eyre::Result;
 
 #[derive(Debug, Parser)]
 struct Cli {
     /// The token to use to request information from Shortcut's REST API
+    #[clap(env = "SHORTCUT_API_TOKEN")]
     shortcut_api_token: String,
 }
 
 impl Cli {
-    fn run(&self) -> Result<()> {
-        color_eyre::eyre::bail!("TODO")
+    async fn run(&self) -> Result<()> {
+        let client = shortcut::Client::new(&self.shortcut_api_token);
+
+        let stories = client.stories().await?;
+        println!("{stories:#?}");
+
+        Ok(())
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     color_eyre::install().expect("color_eyre to install handlers");
 
     let cli = Cli::parse();
 
-    if let Err(err) = cli.run() {
+    if let Err(err) = cli.run().await {
         println!("{err:?}");
         std::process::exit(1)
     }

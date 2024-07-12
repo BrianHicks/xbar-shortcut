@@ -4,5 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.5.9", features = ["derive", "color"] }
+clap = { version = "4.5.9", features = ["derive", "color", "env"] }
 color-eyre = "0.6.3"
+eyre = "0.6.12"
+reqwest = { version = "0.12.5", features = ["json"] }
+serde = { version = "1.0.204", features = ["derive"] }
+tokio = { version = "1.38.0", features = ["full"] }
