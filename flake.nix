@@ -6,8 +6,19 @@
 
   outputs = inputs:
     inputs.flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import inputs.nixpkgs { inherit system; };
-      in {
+      let
+        pkgs = import inputs.nixpkgs { inherit system; };
+
+        darwinInputs =
+          if pkgs.stdenv.isDarwin then
+            [
+              pkgs.darwin.apple_sdk.frameworks.Security
+              pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+            ]
+          else
+            [ ];
+      in
+      {
         formatter = pkgs.nixpkgs-fmt;
 
         devShell = pkgs.mkShell {
@@ -20,7 +31,7 @@
 
             # macOS needs this for whatever reason
             pkgs.libiconv
-          ];
+          ] ++ darwinInputs;
         };
       }
     );
