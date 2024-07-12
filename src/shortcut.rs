@@ -13,14 +13,15 @@ pub struct Story {
     pub app_url: String,
     pub story_type: String,
     pub deadline: Option<chrono::DateTime<chrono::Utc>>,
+    pub planned_start_date: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Epic {
     pub name: String,
     pub app_url: String,
-    pub deadline: String,
-    pub state: String,
+    pub deadline: Option<chrono::DateTime<chrono::Utc>>,
+    pub planned_start_date: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 pub struct Client {
@@ -35,10 +36,18 @@ impl Client {
     }
 
     pub async fn stories(&self, query: &str) -> Result<Vec<Story>> {
-        return self.search(query).await;
+        return self.search("stories", query).await;
     }
 
-    pub async fn search<T: serde::de::DeserializeOwned>(&self, query: &str) -> Result<Vec<T>> {
+    pub async fn epics(&self, query: &str) -> Result<Vec<Epic>> {
+        return self.search("epics", query).await;
+    }
+
+    pub async fn search<T: serde::de::DeserializeOwned>(
+        &self,
+        kind: &str,
+        query: &str,
+    ) -> Result<Vec<T>> {
         let client = reqwest::Client::new();
 
         let mut out = Vec::with_capacity(16);
@@ -47,7 +56,7 @@ impl Client {
         while let Some(next_url) = next {
             let req = if next_url.is_empty() {
                 client
-                    .get("https://api.app.shortcut.com/api/v3/search/stories")
+                    .get(format!("https://api.app.shortcut.com/api/v3/search/{kind}"))
                     .query(&[("query", query)])
             } else {
                 client.get(format!("https://api.app.shortcut.com{next_url}"))
