@@ -61,6 +61,11 @@ impl Cli {
                 if let Some(deadline) = story.deadline {
                     lines.push(format!("-- due {}", deadline.format("%A, %B %-e")))
                 }
+
+                lines.push(format!(
+                    "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}'\"",
+                    story.app_url
+                ))
             }
         }
 
@@ -93,6 +98,11 @@ impl Cli {
                 if let Some(deadline) = epic.deadline {
                     lines.push(format!("-- due {}", deadline.format("%A, %B %-e")))
                 }
+
+                lines.push(format!(
+                    "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}'\"",
+                    epic.app_url
+                ))
             }
         }
 
