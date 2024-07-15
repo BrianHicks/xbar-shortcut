@@ -36,7 +36,10 @@ impl Cli {
             lines.push(format!("{story_state} | size=14"));
 
             let stories = client
-                .stories(&format!("owner:{0} state:\"{story_state}\"", self.for_user))
+                .stories(&format!(
+                    "owner:{0} state:\"{story_state}\" -is:archived",
+                    self.for_user
+                ))
                 .await?;
 
             for story in stories {
