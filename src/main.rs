@@ -66,7 +66,7 @@ impl Cli {
                 }
 
                 lines.push(format!(
-                    "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}'\"",
+                    "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}' | pbcopy\"",
                     story.app_url
                 ));
 
@@ -77,7 +77,7 @@ impl Cli {
                     slugify!(&story.name, max_length = 40)
                 );
                 lines.push(format!(
-                    "{branch_name} | shell=bash param1=-c param2=\"printf '%s' '{branch_name}\""
+                    "{branch_name} | shell=bash param1=-c param2=\"printf '%s' '{branch_name}' | pbcopy\""
                 ))
             }
         }
