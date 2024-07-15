@@ -71,13 +71,13 @@ impl Cli {
                 ));
 
                 let branch_name = format!(
-                    "-- {}/sc-{}/{}",
+                    "{}/sc-{}/{}",
                     self.for_user,
                     story.id,
                     slugify!(&story.name, max_length = 40)
                 );
                 lines.push(format!(
-                    "{branch_name} | shell=bash param1=-c param2=\"printf '%s' '{branch_name}' | pbcopy\""
+                    "-- {branch_name} | shell=bash param1=-c param2=\"printf '%s' '{branch_name}' | pbcopy\""
                 ))
             }
         }
