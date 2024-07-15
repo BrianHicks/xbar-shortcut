@@ -116,7 +116,7 @@ impl Cli {
                 }
 
                 lines.push(format!(
-                    "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}'\"",
+                    "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}' | pbcopy\"",
                     epic.app_url
                 ))
             }
