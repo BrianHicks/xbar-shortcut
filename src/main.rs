@@ -102,7 +102,7 @@ impl Cli {
             println!("{}", headline);
         }
 
-        println!("{}", lines.join("\n"));
+        println!("---\n{}", lines.join("\n"));
 
         Ok(())
     }

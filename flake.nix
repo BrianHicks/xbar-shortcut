@@ -50,6 +50,7 @@
               pkgs.clippy
               pkgs.rustc
               pkgs.rustfmt
+              pkgs.libiconv
 
               # for some reason this seems to be required, especially on macOS
               pkgs.clippy
