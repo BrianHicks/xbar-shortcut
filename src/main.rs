@@ -32,6 +32,8 @@ impl Cli {
         lines.push("Stories | size=18".into());
 
         for story_state in &self.story_state {
+            lines.push(format!("{story_state} | size=14"));
+
             let stories = client
                 .stories(&format!("owner:{0} state:\"{story_state}\"", self.for_user))
                 .await?;
