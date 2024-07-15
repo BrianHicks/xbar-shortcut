@@ -29,7 +29,7 @@ impl Cli {
         let mut headline = String::with_capacity(16);
         let mut lines = Vec::with_capacity(32);
 
-        lines.push("Stories".into());
+        lines.push("Stories | size=18".into());
 
         for story_state in &self.story_state {
             let stories = client
@@ -69,7 +69,7 @@ impl Cli {
             }
         }
 
-        lines.push("Epics".into());
+        lines.push("Epics | size=18".into());
 
         for epic_state in &self.epic_state {
             let epics = client
