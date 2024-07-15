@@ -2,6 +2,7 @@ mod shortcut;
 
 use clap::Parser;
 use color_eyre::Result;
+use slugify::slugify;
 
 #[derive(Debug, Parser)]
 struct Cli {
@@ -67,6 +68,16 @@ impl Cli {
                 lines.push(format!(
                     "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}'\"",
                     story.app_url
+                ));
+
+                let branch_name = format!(
+                    "-- {}/sc-{}/{}",
+                    self.for_user,
+                    story.id,
+                    slugify!(&story.name, max_length = 40)
+                );
+                lines.push(format!(
+                    "{branch_name} | shell=bash param1=-c param2=\"printf '%s' '{branch_name}\""
                 ))
             }
         }
