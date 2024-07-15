@@ -2,6 +2,7 @@ mod shortcut;
 
 use clap::Parser;
 use color_eyre::Result;
+use slugify::slugify;
 
 #[derive(Debug, Parser)]
 struct Cli {
@@ -29,9 +30,11 @@ impl Cli {
         let mut headline = String::with_capacity(16);
         let mut lines = Vec::with_capacity(32);
 
-        lines.push("Stories".into());
+        lines.push("Stories | size=18".into());
 
         for story_state in &self.story_state {
+            lines.push(format!("{story_state} | size=14"));
+
             let stories = client
                 .stories(&format!("owner:{0} state:\"{story_state}\"", self.for_user))
                 .await?;
@@ -61,10 +64,25 @@ impl Cli {
                 if let Some(deadline) = story.deadline {
                     lines.push(format!("-- due {}", deadline.format("%A, %B %-e")))
                 }
+
+                lines.push(format!(
+                    "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}' | pbcopy\"",
+                    story.app_url
+                ));
+
+                let branch_name = format!(
+                    "{}/sc-{}/{}",
+                    self.for_user,
+                    story.id,
+                    slugify!(&story.name, max_length = 40)
+                );
+                lines.push(format!(
+                    "-- {branch_name} | shell=bash param1=-c param2=\"printf '%s' '{branch_name}' | pbcopy\""
+                ))
             }
         }
 
-        lines.push("Epics".into());
+        lines.push("Epics | size=18".into());
 
         for epic_state in &self.epic_state {
             let epics = client
@@ -93,6 +111,11 @@ impl Cli {
                 if let Some(deadline) = epic.deadline {
                     lines.push(format!("-- due {}", deadline.format("%A, %B %-e")))
                 }
+
+                lines.push(format!(
+                    "-- Copy URL | shell=bash param1=-c param2=\"printf '%s' '{}'\"",
+                    epic.app_url
+                ))
             }
         }
 
