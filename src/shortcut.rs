@@ -10,6 +10,7 @@ pub struct SearchResponse<T> {
 #[derive(Debug, Deserialize)]
 pub struct Story {
     pub name: String,
+    pub id: usize,
     pub app_url: String,
     pub story_type: String,
     pub deadline: Option<chrono::DateTime<chrono::Utc>>,
