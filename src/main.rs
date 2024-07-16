@@ -45,22 +45,11 @@ impl Cli {
             for story in stories {
                 let mut line = String::with_capacity(64);
 
-                if let Some(days) = days_remaining(story.planned_start_date, story.deadline) {
-                    if days <= 1 {
-                        headline.push_str("🟠");
-                        line.push_str("🟠 ");
-                    } else if days <= 3 {
-                        headline.push('🟡');
-                        line.push_str("🟡 ");
-                    } else {
-                        headline.push_str("🟢");
-                        line.push_str("🟢 ");
-                    }
-                } else {
-                    headline.push_str("⚪️");
-                    line.push_str("⚪️ ");
-                }
+                let emoji = days_remaining_emoji(story.planned_start_date, story.deadline);
+                headline.push_str(emoji);
 
+                line.push_str(emoji);
+                line.push(' ');
                 line.push_str(&story.name);
                 line.push_str(" (");
                 line.push_str(&story.story_type);
@@ -99,18 +88,11 @@ impl Cli {
 
             for epic in epics {
                 let mut line = String::with_capacity(64);
+
+                line.push_str(days_remaining_emoji(epic.planned_start_date, epic.deadline));
+                line.push(' ');
+
                 line.push_str(&epic.name);
-
-                if let Some(days) = days_remaining(epic.planned_start_date, epic.deadline) {
-                    if days <= 1 {
-                        headline.push_str("⚠️");
-                        line.push_str(" ⚠️");
-                    } else if days <= 7 {
-                        headline.push('🔜');
-                        line.push_str(" 🔜");
-                    }
-                }
-
                 line.push_str(" | href=");
                 line.push_str(&epic.app_url);
 
@@ -152,6 +134,19 @@ fn days_remaining(
     }
 
     deadline.map(|date| (date - now).num_days())
+}
+
+fn days_remaining_emoji(
+    planned_start_date: Option<chrono::DateTime<chrono::Utc>>,
+    deadline: Option<chrono::DateTime<chrono::Utc>>,
+) -> &'static str {
+    match days_remaining(planned_start_date, deadline) {
+        Some(days) if days <= 0 => "🔴",
+        Some(days) if days <= 1 => "🟠",
+        Some(days) if days <= 3 => "🟡",
+        Some(_) => "🟢",
+        None => "🔵",
+    }
 }
 
 #[tokio::main]
