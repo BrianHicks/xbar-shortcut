@@ -35,12 +35,19 @@ impl Cli {
         for story_state in &self.story_state {
             lines.push(format!("{story_state} | size=14"));
 
-            let stories = client
+            let mut stories = client
                 .stories(&format!(
                     "owner:{0} state:\"{story_state}\" -is:archived",
                     self.for_user
                 ))
                 .await?;
+
+            stories.sort_by_key(|s| {
+                s.deadline.unwrap_or_else(|| {
+                    chrono::Utc::now()
+                        + chrono::TimeDelta::new(60 * 60 * 24 * 365, 0).expect("valid time delta")
+                })
+            });
 
             for story in stories {
                 let mut line = String::with_capacity(64);
@@ -82,9 +89,16 @@ impl Cli {
         lines.push("Epics | size=18".into());
 
         for epic_state in &self.epic_state {
-            let epics = client
+            let mut epics = client
                 .epics(&format!("owner:{} state:\"{epic_state}\"", self.for_user))
                 .await?;
+
+            epics.sort_by_key(|s| {
+                s.deadline.unwrap_or_else(|| {
+                    chrono::Utc::now()
+                        + chrono::TimeDelta::new(60 * 60 * 24 * 365, 0).expect("valid time delta")
+                })
+            });
 
             for epic in epics {
                 let mut line = String::with_capacity(64);
