@@ -44,28 +44,27 @@ impl Cli {
 
             for story in stories {
                 let mut line = String::with_capacity(64);
-                line.push_str(&story.name);
-                line.push_str(" (");
-                line.push_str(&story.story_type);
-                line.push(')');
 
                 if let Some(days) = days_remaining(story.planned_start_date, story.deadline) {
                     if days <= 1 {
                         headline.push_str("🟠");
-                        line.push_str(" 🟠");
+                        line.push_str("🟠 ");
                     } else if days <= 3 {
                         headline.push('🟡');
-                        line.push_str(" 🟡");
+                        line.push_str("🟡 ");
                     } else {
                         headline.push_str("🟢");
-                        line.push_str(" 🟢");
+                        line.push_str("🟢 ");
                     }
                 } else {
                     headline.push_str("⚪️");
-                    line.push_str(" ⚪️");
+                    line.push_str("⚪️ ");
                 }
 
-                line.push_str(" | href=");
+                line.push_str(&story.name);
+                line.push_str(" (");
+                line.push_str(&story.story_type);
+                line.push_str(") | href=");
                 line.push_str(&story.app_url);
 
                 lines.push(line);
