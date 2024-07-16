@@ -35,31 +35,32 @@ impl Cli {
         for story_state in &self.story_state {
             lines.push(format!("{story_state} | size=14"));
 
-            let stories = client
+            let mut stories = client
                 .stories(&format!(
                     "owner:{0} state:\"{story_state}\" -is:archived",
                     self.for_user
                 ))
                 .await?;
 
+            stories.sort_by_key(|s| {
+                s.deadline.unwrap_or_else(|| {
+                    chrono::Utc::now()
+                        + chrono::TimeDelta::new(60 * 60 * 24 * 365, 0).expect("valid time delta")
+                })
+            });
+
             for story in stories {
                 let mut line = String::with_capacity(64);
+
+                let emoji = days_remaining_emoji(story.planned_start_date, story.deadline);
+                headline.push_str(emoji);
+
+                line.push_str(emoji);
+                line.push(' ');
                 line.push_str(&story.name);
                 line.push_str(" (");
                 line.push_str(&story.story_type);
-                line.push(')');
-
-                if let Some(days) = days_remaining(story.planned_start_date, story.deadline) {
-                    if days <= 1 {
-                        headline.push_str("⚠️");
-                        line.push_str(" ⚠️");
-                    } else if days <= 7 {
-                        headline.push('🔜');
-                        line.push_str(" 🔜");
-                    }
-                }
-
-                line.push_str(" | href=");
+                line.push_str(") | href=");
                 line.push_str(&story.app_url);
 
                 lines.push(line);
@@ -88,24 +89,24 @@ impl Cli {
         lines.push("Epics | size=18".into());
 
         for epic_state in &self.epic_state {
-            let epics = client
+            let mut epics = client
                 .epics(&format!("owner:{} state:\"{epic_state}\"", self.for_user))
                 .await?;
 
+            epics.sort_by_key(|s| {
+                s.deadline.unwrap_or_else(|| {
+                    chrono::Utc::now()
+                        + chrono::TimeDelta::new(60 * 60 * 24 * 365, 0).expect("valid time delta")
+                })
+            });
+
             for epic in epics {
                 let mut line = String::with_capacity(64);
+
+                line.push_str(days_remaining_emoji(epic.planned_start_date, epic.deadline));
+                line.push(' ');
+
                 line.push_str(&epic.name);
-
-                if let Some(days) = days_remaining(epic.planned_start_date, epic.deadline) {
-                    if days <= 1 {
-                        headline.push_str("⚠️");
-                        line.push_str(" ⚠️");
-                    } else if days <= 7 {
-                        headline.push('🔜');
-                        line.push_str(" 🔜");
-                    }
-                }
-
                 line.push_str(" | href=");
                 line.push_str(&epic.app_url);
 
@@ -147,6 +148,19 @@ fn days_remaining(
     }
 
     deadline.map(|date| (date - now).num_days())
+}
+
+fn days_remaining_emoji(
+    planned_start_date: Option<chrono::DateTime<chrono::Utc>>,
+    deadline: Option<chrono::DateTime<chrono::Utc>>,
+) -> &'static str {
+    match days_remaining(planned_start_date, deadline) {
+        Some(days) if days < 0 => "🔴",
+        Some(days) if days < 1 => "🟠",
+        Some(days) if days < 2 => "🟡",
+        Some(_) => "🟢",
+        None => "🔵",
+    }
 }
 
 #[tokio::main]
