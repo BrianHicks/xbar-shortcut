@@ -141,9 +141,9 @@ fn days_remaining_emoji(
     deadline: Option<chrono::DateTime<chrono::Utc>>,
 ) -> &'static str {
     match days_remaining(planned_start_date, deadline) {
-        Some(days) if days <= 0 => "🔴",
-        Some(days) if days <= 1 => "🟠",
-        Some(days) if days <= 3 => "🟡",
+        Some(days) if days < 0 => "🔴",
+        Some(days) if days < 1 => "🟠",
+        Some(days) if days < 2 => "🟡",
         Some(_) => "🟢",
         None => "🔵",
     }
