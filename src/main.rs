@@ -51,12 +51,18 @@ impl Cli {
 
                 if let Some(days) = days_remaining(story.planned_start_date, story.deadline) {
                     if days <= 1 {
-                        headline.push_str("⚠️");
-                        line.push_str(" ⚠️");
-                    } else if days <= 7 {
-                        headline.push('🔜');
-                        line.push_str(" 🔜");
+                        headline.push_str("🟠");
+                        line.push_str(" 🟠");
+                    } else if days <= 3 {
+                        headline.push('🟡');
+                        line.push_str(" 🟡");
+                    } else {
+                        headline.push_str("🟢");
+                        line.push_str(" 🟢");
                     }
+                } else {
+                    headline.push_str("⚪️");
+                    line.push_str(" ⚪️");
                 }
 
                 line.push_str(" | href=");
